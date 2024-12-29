@@ -1,5 +1,32 @@
-%parse the gameConfig and build the GameState trough that
-initial_state(H/H-11, [['.','P','.','P','.','P','.','P','.','P','.'],
+%[ current_player , [board] , [p1 , p2]] where p1,p2 0,1,2 based on difficulty and game type and board [P | [X | Y]] where P is colour and XY the coordinates
+
+play:-
+    write('Hello! Welcome to Ayu! Press any of the numbers to choose your option'), nl,
+    write('1 - Start a game'), nl,
+    write('2 - Rules'), nl,
+    write('3 - Quit'), nl,
+    read(Choice),
+    handle_choice(Choice).
+
+% Handle menu options
+handle_choice(1) :-
+    write('Starting a new game...'), nl.
+    %get game config
+    %start game
+handle_choice(2) :-
+    write('Ayu Rules:'), nl,
+    write('1. Players take turns placing stones on the board.'), nl,
+    write('2. The objective is to capture more stones than your opponent.'), nl,
+    write('3. Captures are made by surrounding opponent stones.'), nl,
+    write('4. The game ends when the board is full.'), nl,
+    play. % Return to the menu
+handle_choice(3) :-
+    write('Goodbye!'), nl.
+handle_choice(_) :-
+    write('Invalid choice. Please choose 1, 2, or 3.'), nl,
+    play.
+
+initial_state(H/H-11,[['.','P','.','P','.','P','.','P','.','P','.'],
                       ['B','.','B','.','B','.','B','.','B','.','B'],
                       ['.','P','.','P','.','P','.','P','.','P','.'],
                       ['B','.','B','.','B','.','B','.','B','.','B'],
@@ -11,11 +38,6 @@ initial_state(H/H-11, [['.','P','.','P','.','P','.','P','.','P','.'],
                       ['B','.','B','.','B','.','B','.','B','.','B'],
                       ['.','P','.','P','.','P','.','P','.','P','.']]).
 
-
-play:-
-    write('Type the config:'), nl,
-    read(Config),
-    initial_state(Config, Board), print_board(Board).
 
 
 

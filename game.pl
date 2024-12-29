@@ -13,8 +13,8 @@ play:-
 
 handle_choice(1) :-
     get_game_config(Config),
-    initial_state(Config, IntialState), !,
-    display_game(IntialState).
+    initial_state(Config, IntialState),
+    game_loop(IntialState).
 
 handle_choice(2) :-
     write('Ayu Rules:'), nl,
@@ -33,6 +33,9 @@ handle_choice(_) :-
     write('Invalid choice. Please choose 1, 2, or 3.'), nl,
     play.
 
+game_loop(IntialState) :-
+    display_game(IntialState).
+
 get_game_config(Config) :-
     clear_screen,
     write('Choose the board size (11, 9 or 7):'), nl,
@@ -49,12 +52,11 @@ initial_state([Size,P1,P2], GameState):-
 
 build_board(Size, Board) :-
     findall([Piece, [Row, Col]],
-            (between(1, Size, Row),         % Iterate through rows
-             between(1, Size, Col),         % Iterate through columns
-             piece_at(Row, Col, Piece)),    % Determine the piece at (Row, Col)
+            (between(1, Size, Row),
+             between(1, Size, Col),
+             piece_at(Row, Col, Piece)),
             Board).
 
-% Determine the piece at a given position
 piece_at(Row, Col, b) :-
     1 is Row mod 2,        % Odd row
     0 is Col mod 2.        % Even column
@@ -73,15 +75,7 @@ display_game(GameState):-
     write(GameState), nl,
     read(_).
 
-/*initial_state(+GameConfig, -GameState).
-This predicate receives a desired game configuration and
-returns the corresponding initial game state. Game configuration includes the type of each player
-and other parameters such as board size, use of optional rules, player names, or other information
-to provide more flexibility to the game. The game state describes a snapshot of the current game
-state, including board configuration (typically using list of lists with different atoms for the different
-pieces), identifies the current player (the one playing next), and possibly captured pieces and/or
-pieces yet to be played, or any other information that may be required, depending on the game.
-
+/*
 move(+GameState, +Move, -NewGameState).
 
 valid_moves(+GameState, -ListOfMoves).

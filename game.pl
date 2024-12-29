@@ -1,4 +1,5 @@
-%[ current_player , [board] , [p1 , p2]] where p1,p2 0,1,2 based on difficulty and game type and board [P | [X | Y]] where P is colour and XY the coordinates
+:-use_module(library(between)).
+:-use_module(library(lists)).
 
 play:-
     clear_screen,
@@ -13,7 +14,7 @@ play:-
 handle_choice(1) :-
     get_game_config(Config),
     initial_state(Config, IntialState), !,
-    print_board(IntialState).
+    display_game(IntialState).
 
 handle_choice(2) :-
     write('Ayu Rules:'), nl,
@@ -42,36 +43,35 @@ get_game_config(Config) :-
     read(P2),
     Config = [Size,P1,P2].
 
-initial_state([1,0,0],[['.','P','.','P','.','P','.','P','.','P','.'],
-                      ['B','.','B','.','B','.','B','.','B','.','B'],
-                      ['.','P','.','P','.','P','.','P','.','P','.'],
-                      ['B','.','B','.','B','.','B','.','B','.','B'],
-                      ['.','P','.','P','.','P','.','P','.','P','.'],
-                      ['B','.','B','.','B','.','B','.','B','.','B'],
-                      ['.','P','.','P','.','P','.','P','.','P','.'],
-                      ['B','.','B','.','B','.','B','.','B','.','B'],
-                      ['.','P','.','P','.','P','.','P','.','P','.'],
-                      ['B','.','B','.','B','.','B','.','B','.','B'],
-                      ['.','P','.','P','.','P','.','P','.','P','.']]).
+initial_state([Size,P1,P2], GameState):-
+    build_board(Size, Board),
+    GameState = ['white', Board, [P1,P2]].
 
+build_board(Size, Board) :-
+    findall([Piece, [Row, Col]],
+            (between(1, Size, Row),         % Iterate through rows
+             between(1, Size, Col),         % Iterate through columns
+             piece_at(Row, Col, Piece)),    % Determine the piece at (Row, Col)
+            Board).
 
-print_row([]) :- nl.
-print_row([H|T]) :-
-    write(H), write(' '),
-    print_row(T).
+% Determine the piece at a given position
+piece_at(Row, Col, b) :-
+    1 is Row mod 2,        % Odd row
+    0 is Col mod 2.        % Even column
+piece_at(Row, Col, w) :-
+    0 is Row mod 2,        % Even row
+    1 is Col mod 2.        % Odd column
 
-
-print_board([]).
-print_board([Row|Rest]) :-
-    print_row(Row),
-    print_board(Rest),
-    read(_),
-    fail.
 
 clear_screen :-
     write('\e[2J'),    % ANSI escape code to clear the screen
     write('\e[H'),     % Move cursor to the top-left corner
     flush_output.   
+
+
+display_game(GameState):-
+    write(GameState), nl,
+    read(_).
 
 /*initial_state(+GameConfig, -GameState).
 This predicate receives a desired game configuration and
@@ -81,8 +81,6 @@ to provide more flexibility to the game. The game state describes a snapshot of 
 state, including board configuration (typically using list of lists with different atoms for the different
 pieces), identifies the current player (the one playing next), and possibly captured pieces and/or
 pieces yet to be played, or any other information that may be required, depending on the game.
-
-display_game(+GameState).
 
 move(+GameState, +Move, -NewGameState).
 

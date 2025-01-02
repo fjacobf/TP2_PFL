@@ -49,7 +49,7 @@ get_game_config(Config) :-
 
 initial_state([Size,P1,P2], GameState):-
     build_board(Size, Board),
-    GameState = ['white', Board, [P1,P2]].
+    GameState = ['white', Board, [P1,P2], Size].
 
 build_board(Size, Board) :-
     findall([Piece, [Row, Col]],
@@ -86,31 +86,33 @@ choose_move(GameState, 2, Move):-
 
 /*creates list of move values*/
 test_moves(GameState, [], []).
-test_moves([cur_player | [board | players]], [Hi|Ti], [Ho|To]):-
-    move([cur_player | [board | players]], Hi, NewGameState),
-    value([cur_player | [board | players]], cur_player, Ho),
-    test_moves([cur_player | [board | players]], Ti, To).
+test_moves([Cur_player | X], [Hi|Ti], [Ho|To]):-
+    move([Cur_player | X], Hi, NewGameState),
+    value([Cur_player | X], Cur_player, Ho),
+    test_moves([Cur_player | X], Ti, To).
 
 /*prints the board and borders*/
-display_game([Cur|[Board|Players]]):-
-    \+print_border_tb,write('***'),nl,
-    \+display_board(Board),
-    \+print_border_tb,write('***'),nl,write('  '),
-    \+print_let_coord.
+display_game([Cur|[Board|[Players|Sizel]]]):-
+    nth0(0, Sizel, Size),
+    \+print_border_tb(Size),write('***'),nl,
+    \+display_board(Board, Size),
+    \+print_border_tb(Size),write('***'),nl,write('  '),
+    \+print_let_coord(Size).
 
 /*prints given board*/
-display_board(Board):-
-    between(1, 11, X),
-    C is 12 - X,
+display_board(Board, Size):-
+    between(1, Size, X),
+    N is Size + 1,
+    C is N - X,
     write('* '),
-    \+display_line(Board, C),
+    \+display_line(Board, C, Size),
     write('* '),write(C),
     nl,
     fail.
 
 /*prints selected line*/
-display_line(Board, Column):-
-    between(1, 11, R),
+display_line(Board, Column, Size):-
+    between(1, Size, R),
     display_char(Board, Column, R),
     fail.
 
@@ -123,13 +125,13 @@ display_char(Board, Column, Row):-
     write('.'), write(' ').
 
 /*prints out upper and lower borders*/
-print_border_tb:-
-    between(1,11,X),
+print_border_tb(Size):-
+    between(1,Size,X),
     write('**'),
     fail.
 
-print_let_coord:-
-    between(1, 11, X),
+print_let_coord(Size):-
+    between(1, Size, X),
     N is X + 64,
     put_code(N), write(' '),
     fail.
@@ -155,8 +157,12 @@ choose_move(+GameState, +Level, -Move).
 ],
 [1,2]]
 -----------
+[cur, board, players, size]
+board - [[colour, [x,y]]]
+players - [p1,p2]
+
 parse
-[cur_player | [board | players]]
+[cur_player | [board | [players | size]]]
 cur_player - p or b
 board - 
     [colour, pos]

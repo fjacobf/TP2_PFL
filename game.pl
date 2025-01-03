@@ -1,8 +1,8 @@
 :-use_module(library(between)).
 :-use_module(library(lists)).
 :- use_module(library(random)).
+:- [move_game].
 :- [display_game].
-:- [move].
 :- [loop].
 
 play:-

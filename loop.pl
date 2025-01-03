@@ -1,6 +1,8 @@
+:- [move_game].
 
 game_loop([Cur_Player| [Players | [Board|Size]]]) :-
-    display_game([Board|Size]).
+    display_game([Board|Size]),
+    move([Cur_Player| [Players | [Board|Size]]],[10,a], NewGameState).
 
 
 /*Returns the current player's name if he no longer can make

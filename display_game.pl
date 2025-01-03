@@ -1,5 +1,5 @@
 /*prints the board and borders*/
-display_game([Cur|[Board|[Players|Sizel]]]):-
+display_game([_Cur|[Board|[_Players|Sizel]]]):-
     nth0(0, Sizel, Size),
     \+print_border_tb(Size),write('***'),nl,
     \+display_board(Board, Size),
@@ -28,12 +28,12 @@ display_char(Board, Column, Row):-
     member([X, [Column, Row]], Board),
     write(X), write(' ').
 display_char(Board, Column, Row):-
-    \+member([X, [Column, Row]], Board),
+    \+member([_X, [Column, Row]], Board),
     write('.'), write(' ').
 
 /*prints out upper and lower borders*/
 print_border_tb(Size):-
-    between(1,Size,X),
+    between(1,Size,_X),
     write('**'),
     fail.
 

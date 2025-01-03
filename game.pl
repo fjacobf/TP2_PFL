@@ -2,6 +2,8 @@
 :-use_module(library(lists)).
 :- use_module(library(random)).
 :- [display_game].
+:- [move].
+:- [loop].
 
 play:-
     clear_screen,
@@ -16,6 +18,7 @@ play:-
 handle_choice(1) :-
     get_game_config(Config),
     initial_state(Config, IntialState),
+    write('Black starts!'), nl,
     game_loop(IntialState).
 
 handle_choice(2) :-
@@ -27,8 +30,10 @@ handle_choice(2) :-
     write('Every move must reduce the distance between the moved unit and the closest friendly unit. The distance between two units is the shortest path of adjacent empty points between them, i.e. the number of consecutive moves one would need to join them.'), nl, nl,
 
     write('OBJECTIVE: If a player cannot make a move on his turn, he wins. This usually occurs when said player has joined all his pieces in a single group.'), nl, nl,
-    
-    write('DRAWS: If a board position is repeated with the same player to move, the game will be declared a draw. This is a theoretical possibility if both players cooperate to it. You can find an example of a possible core of such a cooperative cycle in About Ayu. In actual play cooperative cycles do not occur.'), nl,
+
+    write('DRAWS: If a board position is repeated with the same player to move, the game will be declared a draw. This is a theoretical possibility if both players cooperate to it. You can find an example of a possible core of such a cooperative cycle in About Ayu. In actual play cooperative cycles do not occur.'), nl, nl,
+
+    write('Type anything to go back to the menu...'), nl,
     read(_),
     play.
 
@@ -39,22 +44,23 @@ handle_choice(_) :-
     write('Invalid choice. Please choose 1, 2, or 3.'), nl,
     play.
 
-game_loop(IntialState) :-
-    display_game(IntialState).
+%---------------------GAME CONFIG--------------------------
+% Gets the board size and the players
 
-get_game_config(Config) :-
+get_game_config(Config) :- 
     clear_screen,
     write('Choose the board size (11, 9 or 7):'), nl,
     read(Size),
-    write('Player whites \n 0 - Human \n 1 - Random Machine \n 2 - Greedy Machine'), nl,
-    read(P1),
     write('Player blacks \n 0 - Human \n 1 - Random Machine \n 2 - Greedy Machine'), nl,
+    read(P1),
+    write('Player whites \n 0 - Human \n 1 - Random Machine \n 2 - Greedy Machine'), nl,
     read(P2),
     Config = [Size,P1,P2].
 
+%---------------------INITIAL STATE-------------------------
 initial_state([Size,P1,P2], GameState):-
     build_board(Size, Board),
-    GameState = ['white', Board, [P1,P2], Size].
+    GameState = [b, [P1,P2], Board, Size].
 
 build_board(Size, Board) :-
     findall([Piece, [Row, Col]],
@@ -69,41 +75,24 @@ piece_at(Row, Col, b) :-
 piece_at(Row, Col, w) :-
     0 is Row mod 2,        % Even row
     1 is Col mod 2.        % Odd column
-
+%-----------------------------------------------------------
 
 clear_screen :-
     write('\e[2J'),    % ANSI escape code to clear the screen
     write('\e[H'),     % Move cursor to the top-left corner
     flush_output.   
 
-/*chooses the computers move based on the selected level, for 1 it selects a random valid move, for 2 it chooses the move that creates highest value*/
-%choose_move(+GameState, +Level, -Move).
-choose_move(GameState, 1, Move):-
-    valid_moves(GameState, Moves_l),
-    random_member(Move, Moves_l).
-choose_move(GameState, 2, Move):-
-    valid_moves(GameState, Moves_l),
-    length(Moves_l, Lenght),
-    test_moves(GameState, Moves_l, Moves_v),
-    max_list(Moves_v, V),
-    nth(Chosen, Moves_v, V),
-    nth0(Chosen, Moves_l, Move).
 
-/*creates list of move values*/
-test_moves(GameState, [], []).
-test_moves([Cur_player | X], [Hi|Ti], [Ho|To]):-
-    move([Cur_player | X], Hi, NewGameState),
-    value([Cur_player | X], Cur_player, Ho),
-    test_moves([Cur_player | X], Ti, To).
-
-
-
-/*Returns the current player's name if he no longer can make any moves, else returns 0*/
+/*Returns the current player's name if he no longer can make
+any moves, else returns 0*/
 game_over(GameState, Winner):-
     valid_moves(GameState, Moves_l),
     game_over(GameState, Moves_l, Winner).
+
 game_over([Player|X], [], Player):-!.
+
 game_over(GameState, Len, 0).
+
 
 /*
 move(+GameState, +Move, -NewGameState).

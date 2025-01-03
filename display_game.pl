@@ -1,5 +1,5 @@
 /*prints the board and borders*/
-display_game([_Cur|[Board|[_Players|Sizel]]]):-
+display_game([Board|Sizel]):-
     nth0(0, Sizel, Size),
     \+print_border_tb(Size),write('***'),nl,
     \+display_board(Board, Size),

@@ -20,11 +20,15 @@ handle_choice(1) :-
 
 handle_choice(2) :-
     write('Ayu Rules:'), nl,
-    write('1. Players take turns placing stones on the board.'), nl,
-    write('2. The objective is to capture more stones than your opponent.'), nl,
-    write('3. Captures are made by surrounding opponent stones.'), nl,
-    write('4. The game ends when the board is full.'), nl,
-    write('Type anything to go back to menu...'),
+    write('Black plays first, then turns alternate. On each turn, players must complete one of the following actions:'), nl,
+    write('     -Move a friendly singleton to an adjacent empty point.'), nl,
+    write('     -Take a piece from a friendly group and place it on a different empty point adjacent to the same group. All stones that were joined in a single group before the move must still be joined after the move.'), nl, nl,
+
+    write('Every move must reduce the distance between the moved unit and the closest friendly unit. The distance between two units is the shortest path of adjacent empty points between them, i.e. the number of consecutive moves one would need to join them.'), nl, nl,
+
+    write('OBJECTIVE: If a player cannot make a move on his turn, he wins. This usually occurs when said player has joined all his pieces in a single group.'), nl, nl,
+    
+    write('DRAWS: If a board position is repeated with the same player to move, the game will be declared a draw. This is a theoretical possibility if both players cooperate to it. You can find an example of a possible core of such a cooperative cycle in About Ayu. In actual play cooperative cycles do not occur.'), nl,
     read(_),
     play.
 

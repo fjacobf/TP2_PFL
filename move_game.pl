@@ -21,13 +21,10 @@ choose_move(GameState, 2, Move):-
     nth0(Chosen, Moves_l, Move).
 
 %Our Board is [Row,Column] but the user types Column/Row-Column/Row
-validate_move(Color, [Board| _Size], Move, RowO, ColumnO, RowD, ColumnD) :-
+validate_move(Color, [Board| _Size], [RowO, ColumnO, RowD, ColumnD]) :-
     member([Color, [RowO, ColumnO]], Board),
     \+member([_, [RowD, ColumnD]], Board).
 
-validate_move(Color, [Board| _Size], Move, RowO, ColumnO, RowD, ColumnD) :-
-    write('invalid move, try again! Try again!'), nl,
-    choose_pos(Color, [Board| _Size], Move).
 
 /*creates list of move values*/
 test_moves(GameState, [], []).
@@ -40,13 +37,18 @@ test_moves([Cur_player | X], [Hi|Ti], [Ho|To]):-
 
 %----------------------Extras-----------------------
 
-choose_pos(Color, [Board| _Size],Move) :-
+choose_pos(Color, [Board| _Size], Move) :-
     write('What is your move? Write origin->destination (Ex: "a/2-a/3.")'),nl,
     read(ColumnO_unf/RowO-ColumnD_unf/RowD),
     format_column(ColumnO_unf, ColumnO),
     format_column(ColumnD_unf, ColumnD),
-    validate_move(Color, [Board| _Size], Move, RowO, ColumnO, RowD, ColumnD),
-    Move = [RowO, ColumnO, RowD, ColumnD].
+    (validate_move(Color, [Board| _Size], [RowO, ColumnO, RowD, ColumnD]) ->
+    Move = [RowO, ColumnO, RowD, ColumnD],
+    true;
+    write('invalid move, try again!'), nl,
+    choose_pos(Color, [Board| _Size], Move),
+    true
+    ).
 
 format_column(Col_unf, Col):-
     char_code(Col_unf, Col_val),

@@ -1,5 +1,5 @@
 /*prints the board and borders*/
-display_game([Board|[Size]]):-
+display_game([_Cur_Player| [_Players | [Board|[Size]]]]):-
     \+print_border_tb(Size),write('***'),nl,
     \+display_board(Board, Size),
     \+print_border_tb(Size),write('***'),nl,write('  '),

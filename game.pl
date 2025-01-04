@@ -1,12 +1,13 @@
-:-use_module(library(between)).
-:-use_module(library(lists)).
+:- use_module(library(between)).
+:- use_module(library(lists)).
 :- use_module(library(random)).
+:- use_module(library(readutil)).
 :- [move_game].
 :- [display_game].
 :- [loop].
 
 play:-
-    clear_screen,
+    %clear_screen,
     write('Hello! Welcome to Ayu! Press any of the numbers to choose your option'), nl,
     write('1 - Start a game'), nl,
     write('2 - Rules'), nl,

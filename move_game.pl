@@ -68,3 +68,36 @@ choose_pos(Color, [Board| _Size], Move) :-
 format_column(Col_unf, Col):-
     char_code(Col_unf, Col_val),
     Col is Col_val - 96.
+
+valid_moves([Cur_Player| [Players | [Board|_Size]]], ListOfMoves) :-
+    findall(
+        [RowO, ColumnO, RowD, ColumnD], (
+            member([Cur_Player, [RowO, ColumnO]], Board), 
+            validate_move(Cur_Player, [Board|_Size], [RowO, ColumnO, RowD, ColumnD])
+        ),
+        ListOfMoves
+    ).
+
+value(GameState, Player, Value):-
+    valid_moves(GameState, ListOfMoves),
+    get_value(GameState, ListOfMoves, Sum),
+    Value is 100000 - Sum. % dont know if max_list will work with negatives, so most will avoid going there
+
+get_value(GameState, [H|T], Sum):- get_value(GameState, [H|T], Sum, 0).
+get_value(GameState, [], Sum, Sum).
+get_value(GameState, [H|T], Sum, Acc):-
+    move(GameState, H, NewGameState),
+    valid_moves(NewGameState, ListOfMoves),
+    length(ListOfMoves, Value),
+    Acc1 is Acc + Value,
+    get_value(GameState, T, Sum, Acc1).
+
+/*
+get_value(GameState, [], 0).
+get_value(GameState, [H|T], Sum):-
+    move(GameState, H, NewGameState),
+    valid_moves(NewGameState, ListOfMoves),
+    length(ListOfMoves, Value),
+    get_value(GameState, T, Val_sum),
+    Sum is Val_sum + Value.
+*/

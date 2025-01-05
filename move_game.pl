@@ -6,11 +6,11 @@ move([Cur_Player| [Players | [Board|[Size]]]], [RO,CO,RD,CD], NewGameState):-
 
 %------------------- choose move --------------------------
 
-choose_move(GameState, 1, Move):-
+choose_move(GameState, [1], Move):-
     valid_moves(GameState, Moves_l),
     random_member(Move, Moves_l).
 
-choose_move(GameState, 2, Move):-
+choose_move(GameState, [2], Move):-
     valid_moves(GameState, Moves_l),
     length(Moves_l, Lenght),
     test_moves(GameState, Moves_l, Moves_v),

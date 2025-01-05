@@ -1,12 +1,12 @@
 
 %GS = [Cur_Player, Players, Board, Size]
-/*chooses the computers move based on the selected level, for 1 it selects a random valid move, for 2 it chooses the move that creates highest value*/
-%choose_move(+GameState, +Level, -Move).
 
 move([Cur_Player| [Players | [Board|[Size]]]], [RO,CO,RD,CD], NewGameState):-
   delete(Board, [Cur_player,[RO,CO]], TempBoard),
   NewBoard = [[Cur_Player, [RD,CD]] | TempBoard],
   (Cur_player = 'b' -> NewGameState = [w| [Players | [NewBoard|[Size]]]]; NewGameState = [b| [Players | [NewBoard|[Size]]]]).
+
+%------------------- choose move --------------------------
 
 choose_move(GameState, 1, Move):-
     valid_moves(GameState, Moves_l),
@@ -20,10 +20,25 @@ choose_move(GameState, 2, Move):-
     nth(Chosen, Moves_v, V),
     nth0(Chosen, Moves_l, Move).
 
+%---------------------validate move -----------------------------
 %Our Board is [Row,Column] but the user types Column/Row-Column/Row
 validate_move(Color, [Board| _Size], [RowO, ColumnO, RowD, ColumnD]) :-
     member([Color, [RowO, ColumnO]], Board),
     \+member([_, [RowD, ColumnD]], Board).
+
+find_group(Board, [Row, Col], Color, Group) :-
+    flood_fill(Board, [[Row, Col]], Color, [], Group).
+
+flood_fill(_, [], _, Group, Group). % Base case: no more positions to explore
+flood_fill(Board, [[R, C]|ToVisit], Color, Visited, Group) :-
+    \+ member([Color, [R, C]], Visited),          % If not already visited
+    member([Color, [R, C]], Board),              % Ensure it's the correct color
+    find_adjacent([R, C], Adj),                  % Get adjacent positions
+    include(valid_position(Board), Adj, Valid), % Filter valid adjacent positions
+    append(Valid, ToVisit, NewToVisit),          % Add to the visit queue
+    flood_fill(Board, NewToVisit, Color, [[Color, [R, C]]|Visited], Group).
+flood_fill(Board, [_|ToVisit], Color, Visited, Group) :-
+    flood_fill(Board, ToVisit, Color, Visited, Group). % Skip invalid positions
 
 
 /*creates list of move values*/
